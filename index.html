@@ -1,8 +1,24 @@
 <!DOCTYPE html>
-<svg width="960" height="1100"></svg>
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-<script src="https://d3js.org/topojson.v2.min.js"></script>
+
+<head>
+    <title>Washington State Chloropleth</title>
+    <svg width="960" height="1100"></svg>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+</head>
+
+<body>
+    <h1>Washington State Population Density Visualization</h1>
+    <h2>Created by Theodore Dyer for UCSC CSE 163</h2>
+    
+    <div class="buttons">
+        <button class="btn" id="colorbtn">Change Visualization Color</button>
+        <button class="btn" id="tractbtn">Toggle tract bound</button>
+        <button class="btn" id="statebtn">Toggle state bound</button>
+    </div>
+
 <script>
 
 var svg = d3.select("svg"),
@@ -51,7 +67,7 @@ g.call(d3.axisBottom(x)
   .select(".domain")
     .remove();
 
-d3.json("wa-topo.json", function(error, topology) {
+d3.json("wa-topo.json").then(function(error, topology) {
   if (error) throw error;
 
   svg.append("g")
@@ -70,3 +86,11 @@ d3.json("wa-topo.json", function(error, topology) {
 });
 
 </script>
+
+    <p> Testing </p>
+
+
+
+    
+    
+</body>
