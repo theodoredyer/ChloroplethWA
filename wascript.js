@@ -3,7 +3,7 @@ var margin = {top: 10, right: 40, bottom: 150, left: 50},
     height = 500 - margin.top - margin.bottom;
 
 
-var svg = d3.select("disp")
+var svg = d3.select("view")
     .append("svg")
     .attr("class", "wa-svg")
     .attr("width", width + margin.left + margin.right)
@@ -91,6 +91,10 @@ d3.json("wa-topo.json").then(function(topology) {
     var originalColor = 1;
     var visibleSB = 1;
     var visibleTr = 1;
+    
+    d3.select("#colorbtn").on("click", legendColor);
+    d3.select("#tractbtn").on("click", tractoggle);
+    d3.select("#statebtn").on("click", statetoggle);
     
     function legendColor() {
         if(originalColor == 1) {
