@@ -26,14 +26,18 @@ var x = d3.scaleSqrt()
     .rangeRound([440, 950]);
 
 
-d3.json("wa-topo.json").then(function(topology) {
+d3.json("wa-topo.json").then(function (topology) {
     
     var cpath = svg.append("g")
         .selectAll("path")
         .data(topojson.feature(topology, topology.objects.tracts).features)
         .enter().append("path")
-        .attr("fill", function(d) { return color(d.properties.density); })
+        .attr("fill", function(d) { 
+            return color(d.properties.density); 
+        })
         .attr("d", path);
+    
+    console.log(topology.objects.tracts);
 
     svg.append("path")
         .datum(topojson.feature(topology, topology.objects.counties))
