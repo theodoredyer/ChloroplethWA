@@ -43,7 +43,7 @@ d3.json("wa-topo.json").then(function(topology) {
         .attr("d", path);
     
     var statebound = svg.append("path")
-        .datum(topojson.feature(topology, topology.objects.state))
+        .datum(topojson.feature(topology, topology.objects.sate))
         .attr("fill", "none")
         .attr("stroke", "#000")
         .attr("stroke-opacity", 0)
