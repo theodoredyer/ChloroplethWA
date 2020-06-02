@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html> 
-<head>
-    <meta charset="utf-8">
-    <title>Washington State Chloropleth</title>
-    <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https://d3js.org/topojson.v2.min.js"></script>
-</head>
+<svg width="960" height="1100"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
 
 <body>
     <h1>Washington State Population Density Visualization</h1>
@@ -16,12 +13,6 @@
         <button class="btn" id="tractbtn">Toggle tract bound</button>
         <button class="btn" id="statebtn">Toggle state bound</button>
     </div>
-    
-    <div class="view">
-    
-    </div>
-
-    <script type="text/javascript" src="wascript.js"></script>
 
     <p> Acknowledgements </p>
     <ul>
@@ -31,12 +22,140 @@
     
     <p> About the Visualization </p>
     <ul>
-        <li>Created by : Theodore Dyer</li>
-        <li>For course: CSE 163 Data Visualization (Professor: Suresh Lodha)</li>
-        <li>University of California, Santa Cruz Spring 2020</li>
-        <li>6/1/2020</li>
+        <li>https://tdyer21.github.io/ChloroplethWA/</li>
+        <li>Theodore Dyer</li>
+        <li>Instructor: Suresh Lodha)</li>
+        <li>CSE 163: Data programming for Visualization</li>
+        <li>Spring 2020</li>
     </ul>
     
 </body>
 
-</html>
+<script>
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var path = d3.geoPath();
+
+var color = d3.scaleThreshold()
+    .domain([1, 10, 50, 200, 500, 1000, 2000, 4000])
+    .range(d3.schemeOrRd[9]);
+    
+var flipcolor = d3.scaleThreshold()
+    .domain([1, 10, 50, 200, 500, 1000, 2000, 4000])
+    .range(d3.schemeGnBu[9]);    
+
+var x = d3.scaleSqrt()
+    .domain([0, 4500])
+    .rangeRound([440, 950]);
+
+var g = svg.append("g")
+    .attr("class", "key")
+    .attr("transform", "translate(0,40)");
+
+
+g.call(d3.axisBottom(x)
+    .tickSize(13)
+    .tickValues(color.domain()))
+  .select(".domain")
+    .remove();
+
+d3.json("wa-topo.json", function(error, topology) {
+  if (error) throw error;
+
+  var cpath = svg.append("g")
+    .selectAll("path")
+    .data(topojson.feature(topology, topology.objects.tracts).features)
+    .enter().append("path")
+      .attr("fill", function(d) { return color(d.properties.density); })
+      .attr("d", path);
+
+  svg.append("path")
+      .datum(topojson.feature(topology, topology.objects.counties))
+      .attr("fill", "none")
+      .attr("stroke", "#000")
+      .attr("stroke-opacity", 0.3)
+      .attr("d", path);
+    
+  var tracbound = svg.append("path")
+        .datum(topojson.feature(topology, topology.objects.tracts))
+        .attr("fill", "none")
+        .attr("stroke", "#000")
+        .attr("stroke-opacity", 0)
+        .attr("d", path);
+    
+    var legend = g.selectAll("rect")
+        .data(color.range().map(function(d) {
+        d = color.invertExtent(d);
+        if (d[0] == null) d[0] = x.domain()[0];
+        if (d[1] == null) d[1] = x.domain()[1];
+        return d;
+    }))
+    .enter().append("rect")
+        .attr("height", 8)
+        .attr("x", function(d) { return x(d[0]); })
+        .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+        .attr("fill", function(d) { return color(d[0]); });
+    
+    g.append("text")
+        .attr("class", "caption")
+        .attr("x", x.range()[0])
+        .attr("y", -6)
+        .attr("fill", "#000")
+        .attr("text-anchor", "start")
+        .attr("font-weight", "bold")
+        .text("Population per square mile");
+
+    g.call(d3.axisBottom(x)
+        .tickSize(13)
+        .tickValues(color.domain()))
+        .select(".domain")
+        .remove();
+    
+    d3.select("#colorbtn").on("click", legendColor);
+    d3.select("#tractbtn").on("click", tractoggle);
+    d3.select("#statebtn").on("click", tractoggle);
+    
+    var originalColor = 1;
+    var visibleTR = 1;
+    
+    // This function gets called whenever the toggle color button gets clicked to toggle the color of the visualization and legend
+    function legendColor() {
+        if(originalColor == 1) {
+            legend.transition(1000).attr("fill", function(d) {
+                return flipcolor(d[0]);
+            });
+            cpath.transition(1000).attr("fill", function(d) {
+                return flipcolor(d.properties.density);
+            })
+            originalColor = 0;
+        } else {
+            legend.transition(1000).attr("fill", function(d) {
+                return color(d[0]);
+            });
+            cpath.transition(1000).attr("fill", function(d) {
+                return color(d.properties.density);
+            })
+            originalColor = 1;
+        }
+    }
+    
+    // This function gets called whenever the state toggle button gets clicked to toggle the display of the state boundary
+    function tractoggle() {
+        if(visibleTR == 1) {
+            tracbound.attr("stroke-opacity", 0.5);
+            visibleTR = 0;
+        } else {
+            tracbound.attr("stroke-opacity", 0);
+            visibleTR = 1;
+        }
+    }
+    
+    
+    
+    
+});
+
+</script>
